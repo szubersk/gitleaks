@@ -1,7 +1,6 @@
 package detect
 
 import (
-	// "encoding/json"
 	"fmt"
 	"math"
 	"strings"
@@ -79,6 +78,10 @@ func filter(findings []report.Finding, redact uint) []report.Finding {
 					break
 				}
 			}
+		}
+
+		if strings.Contains(strings.ToLower(f.RuleID), "docker-registry-credentials") {
+			f.DecodeBase64()
 		}
 
 		if redact > 0 {

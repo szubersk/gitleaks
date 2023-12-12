@@ -1,6 +1,8 @@
 package report
 
 import (
+	"encoding/base64"
+	"encoding/json"
 	"math"
 	"strings"
 )
@@ -52,6 +54,26 @@ func (f *Finding) Redact(percent uint) {
 	f.Line = strings.Replace(f.Line, f.Secret, secret, -1)
 	f.Match = strings.Replace(f.Match, f.Secret, secret, -1)
 	f.Secret = secret
+}
+
+func (f *Finding) DecodeBase64() {
+	decoded, err := base64.StdEncoding.DecodeString(f.Secret)
+	if err != nil {
+		return
+	}
+
+	var data map[string]any
+	err = json.Unmarshal(decoded, &data)
+	if err != nil {
+		return
+	}
+
+	secret, err := json.Marshal(data)
+	if err != nil {
+		return
+	}
+
+	f.Secret = string(secret)
 }
 
 func maskSecret(secret string, percent uint) string {
